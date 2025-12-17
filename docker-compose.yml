@@ -12,7 +12,29 @@ services:
       - "1433:1433"
     volumes:
       - mssql_data:/var/opt/mssql
+    networks:
+      - app-network
     restart: unless-stopped
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: construction_php
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mssql
+    networks:
+      - app-network
+    command: php yii serve 0.0.0.0:8080
 
 volumes:
   mssql_data:
+
+networks:
+  app-network:
+    driver: bridge
