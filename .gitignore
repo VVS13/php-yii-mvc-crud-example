@@ -1,0 +1,23 @@
+# Yii2 runtime files
+/runtime/
+/web/assets/
+
+# Composer
+/vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+/config/db.php
+
+# Docker volumes data (data persists in volume)
