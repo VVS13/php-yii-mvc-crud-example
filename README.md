@@ -55,7 +55,7 @@ First-time build takes 5-10 minutes.
 docker exec construction_php php yii migrate --interactive=0
 ```
 
-This creates tables and seeds an admin user.
+This creates tables, seeds an admin user and demo db data(workers, managers, sites, tasks).
 
 ### 4. Access Application
 

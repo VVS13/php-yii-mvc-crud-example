@@ -35,13 +35,15 @@ $this->title = 'Login';
         ]) ?>
 
         <div class="d-grid gap-2">
-            
+
             <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
         </div>
 
     <?php ActiveForm::end(); ?>
 
     <div style="color:#999;">
-        <br>Admin: <strong>admin / Admin123!</strong><br>            
+        <br>Admin: <strong>admin / Admin123!</strong><br>
+        <br>Managers: <strong>manager1/2/3 - password</strong><br>
+        <br>Workers: <strong>worker1/2/3 - password</strong><br>
     </div>
 </div>
