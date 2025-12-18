@@ -50,14 +50,21 @@ docker compose up -d --build
 
 First-time build takes 5-10 minutes.
 
-### 3. Run Database Migrations
+### 3. Create Database in Docker Container
+```bash
+docker exec construction_mssql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Ku12x66W73=/" -d master -C -Q "CREATE DATABASE construction_db;"
+```
+
+Creates MSSQL Database (construction_db) in construction_mssql docker container
+
+### 4. Run Database Migrations
 ```bash
 docker exec construction_php php yii migrate --interactive=0
 ```
 
 This creates tables, seeds an admin user and demo db data(workers, managers, sites, tasks).
 
-### 4. Access Application
+### 5. Access Application
 
 Open browser: **http://localhost:8080**
 
