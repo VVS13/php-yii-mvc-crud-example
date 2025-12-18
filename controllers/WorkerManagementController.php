@@ -40,7 +40,8 @@ class WorkerManagementController extends Controller
      * Lists all users based on role
      */
     public function actionIndex()
-    {
+    {   
+        /** @var app\models\User $user */
         $user = Yii::$app->user->identity;
         
         // Build query based on role
@@ -94,6 +95,7 @@ class WorkerManagementController extends Controller
      */
     public function actionCreate()
     {
+        /** @var app\models\User $user */
         $user = Yii::$app->user->identity;
         
         // Only admins can create users
@@ -181,6 +183,7 @@ class WorkerManagementController extends Controller
      */
     protected function canViewUser($user)
 {
+    /** @var app\models\User $currentUser */
     $currentUser = Yii::$app->user->identity;
 
     // Can't view users from different company
@@ -207,6 +210,7 @@ class WorkerManagementController extends Controller
      */
     protected function canEditUser($user)
 {
+    /** @var app\models\User $currentUser */
     $currentUser = Yii::$app->user->identity;
 
     // Only admins can edit
