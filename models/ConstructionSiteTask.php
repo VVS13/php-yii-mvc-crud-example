@@ -149,18 +149,27 @@ class ConstructionSiteTask extends ActiveRecord
     /**
      * Get warning status for task
      * Returns: null, 'worker_not_assigned', 'worker_disabled', 'worker_access_level_issue'
+     * Past tasks never show warnings
      */
     public function getWarningStatus()
     {
+        // Past tasks don't show warnings (historical data)
+        if ($this->isPast()) {
+            return null;
+        }
+        
         if ($this->isUnassigned()) {
             return 'worker_not_assigned';
         }
+
         if ($this->hasDisabledWorker()) {
             return 'worker_disabled';
         }
+
         if ($this->hasAccessLevelIssue()) {
             return 'worker_access_level_issue';
         }
+        
         return null;
     }
 

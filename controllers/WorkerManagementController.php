@@ -40,17 +40,17 @@ class WorkerManagementController extends Controller
      * Lists all users based on role
      */
     public function actionIndex()
-    {   
-        /** @var app\models\User $user */
-        $user = Yii::$app->user->identity;
+    {
+        /** @var app\models\User $currentUser */
+        $currentUser = Yii::$app->user->identity;
         
         // Build query based on role
-        $query = User::find()->where(['company_id' => $user->company_id]);
+        $query = User::find()->where(['company_id' => $currentUser->company_id]);
         
-        if ($user->isManager()) {
+        if ($currentUser->isManager()) {
             // Managers see only Workers
             $query->andWhere(['role' => User::ROLE_WORKER]);
-        } elseif ($user->isWorker()) {
+        } elseif ($currentUser->isWorker()) {
             // Workers see nothing (handled in view)
             $query->andWhere(['id' => -1]); // Return empty result
         }
@@ -59,7 +59,7 @@ class WorkerManagementController extends Controller
         $users = $query->orderBy(['role' => SORT_DESC, 'name' => SORT_ASC])->all();
 
         return $this->render('index', [
-            'currentUser' => $user,
+            'currentUser' => $currentUser,
             'users' => $users,
         ]);
     }
@@ -95,16 +95,16 @@ class WorkerManagementController extends Controller
      */
     public function actionCreate()
     {
-        /** @var app\models\User $user */
-        $user = Yii::$app->user->identity;
+        /** @var app\models\User $currentUser */
+        $currentUser = Yii::$app->user->identity;
         
         // Only admins can create users
-        if (!$user->isAdmin()) {
+        if (!$currentUser->isAdmin()) {
             throw new NotFoundHttpException('Access denied.');
         }
 
         $model = new User();
-        $model->company_id = $user->company_id;
+        $model->company_id = $currentUser->company_id;
         $model->enabled = true;
 
         if ($model->load(Yii::$app->request->post())) {
@@ -145,6 +145,28 @@ class WorkerManagementController extends Controller
                 return $this->render('update', ['model' => $model]);
             }
 
+            // Handle role changes
+            if ($model->isAttributeChanged('role')) {
+                $oldRole = $model->getOldAttribute('role');
+                $newRole = $model->role;
+                
+                // Manager -> Worker: clear site assignments
+                if ($oldRole === User::ROLE_MANAGER && $newRole === User::ROLE_WORKER) {
+                    \app\models\ConstructionSite::updateAll(['manager_id' => null], ['manager_id' => $model->id]);
+                }
+                
+                // Worker -> Manager: clear only future/current task assignments
+                if ($oldRole === User::ROLE_WORKER && $newRole === User::ROLE_MANAGER) {
+                    \app\models\ConstructionSiteTask::updateAll(
+                        ['assigned_worker_id' => null], 
+                        ['and', 
+                            ['assigned_worker_id' => $model->id],
+                            ['>=', 'end_date', date('Y-m-d')]
+                        ]
+                    );
+                }
+            }
+
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'User updated successfully.');
                 return $this->redirect(['index']);
@@ -182,54 +204,54 @@ class WorkerManagementController extends Controller
      * Check if current user can view another user
      */
     protected function canViewUser($user)
-{
-    /** @var app\models\User $currentUser */
-    $currentUser = Yii::$app->user->identity;
+    {
+        /** @var app\models\User $currentUser */
+        $currentUser = Yii::$app->user->identity;
 
-    // Can't view users from different company
-    if ($user->company_id !== $currentUser->company_id) {
-        return false;
+        // Can't view users from different company
+        if ($user->company_id !== $currentUser->company_id) {
+            return false;
+        }
+
+        // Workers can only view themselves
+        if ($currentUser->isWorker()) {
+            return $user->id === $currentUser->id;
+        }
+
+        // Managers can view Workers
+        if ($currentUser->isManager()) {
+            return $user->isWorker();
+        }
+
+        // Admins can view everyone
+        return true;
     }
-
-    // Workers can only view themselves
-    if ($currentUser->isWorker()) {
-        return $user->id === $currentUser->id;
-    }
-
-    // Managers can view Workers
-    if ($currentUser->isManager()) {
-        return $user->isWorker();
-    }
-
-    // Admins can view everyone
-    return true;
-}
 
     /**
      * Check if current user can edit another user
      */
     protected function canEditUser($user)
-{
-    /** @var app\models\User $currentUser */
-    $currentUser = Yii::$app->user->identity;
+    {
+        /** @var app\models\User $currentUser */
+        $currentUser = Yii::$app->user->identity;
 
-    // Only admins can edit
-    if (!$currentUser->isAdmin()) {
-        return false;
+        // Only admins can edit
+        if (!$currentUser->isAdmin()) {
+            return false;
+        }
+
+        // Can't edit users from different company
+        if ($user->company_id !== $currentUser->company_id) {
+            return false;
+        }
+
+        // Can't edit other Admins
+        if ($user->isAdmin()) {
+            return false;
+        }
+
+        return true;
     }
-
-    // Can't edit users from different company
-    if ($user->company_id !== $currentUser->company_id) {
-        return false;
-    }
-
-    // Can't edit other Admins
-    if ($user->isAdmin()) {
-        return false;
-    }
-
-    return true;
-}
 
     /**
      * Finds the User model based on its primary key value
