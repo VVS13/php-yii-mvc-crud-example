@@ -2,6 +2,9 @@
 
 /** @var yii\web\View $this */
 /** @var string $content */
+/** @var Model app/models/User $user */
+
+$user = Yii::$app->user->identity;
 
 use app\assets\AppAsset;
 use yii\bootstrap5\Html;
@@ -19,6 +22,7 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body {
             padding-top: 56px;
@@ -78,7 +82,7 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav ms-auto'],
         'items' => [
-            ['label' => 'User: ' . Yii::$app->user->identity->getFullName(), 'url' => '#', 'options' => ['class' => 'text-white']],
+            ['label' => 'User: ' . $user->getFullName(), 'url' => '#', 'options' => ['class' => 'text-white']],
         ],
     ]);
     
