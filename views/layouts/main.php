@@ -64,6 +64,20 @@ AppAsset::register($this);
             width: 160px;
             left: 20px;
         }
+        /* Task warning styles */
+        .task-warning {
+            border-left: 4px solid #dc3545 !important;
+        }
+        .task-past {
+            opacity: 0.5;
+        }
+        .task-past .btn {
+            opacity: 1;
+        }
+        .warning-icon {
+            color: #dc3545;
+            cursor: help;
+        }
     </style>
 </head>
 <body class="d-flex flex-column h-100">
@@ -118,6 +132,27 @@ AppAsset::register($this);
 
     <!-- Main Content -->
     <div class="main-content">
+        <?php if (Yii::$app->session->hasFlash('success')): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?= Yii::$app->session->getFlash('success') ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (Yii::$app->session->hasFlash('error')): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?= Yii::$app->session->getFlash('error') ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (Yii::$app->session->hasFlash('warning')): ?>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <?= Yii::$app->session->getFlash('warning') ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
         <?= $content ?>
     </div>
 </div>

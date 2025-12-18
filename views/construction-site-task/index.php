@@ -81,18 +81,18 @@ $this->title = 'Construction Tasks';
                                                 title="View">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <?php if (!$currentUser->isWorker()): ?>
+                                        <?php if (!$currentUser->isWorker() && !$task->isPast()): ?>
                                             <?= Html::a('<i class="bi bi-pencil"></i>', ['update', 'id' => $task->id], [
                                                 'class' => 'btn btn-sm btn-warning',
                                                 'title' => 'Edit',
                                             ]) ?>
-                                            <?= Html::a('<i class="bi bi-trash"></i>', ['delete', 'id' => $task->id], [
-                                                'class' => 'btn btn-sm btn-danger',
-                                                'title' => 'Delete',
-                                                'data-method' => 'post',
-                                                'data-confirm' => 'Are you sure you want to delete this task?',
-                                            ]) ?>
                                         <?php endif; ?>
+                                        <?= Html::a('<i class="bi bi-trash"></i>', ['delete', 'id' => $task->id], [
+                                            'class' => 'btn btn-sm btn-danger',
+                                            'title' => 'Delete',
+                                            'data-method' => 'post',
+                                            'data-confirm' => 'Are you sure you want to delete this task?',
+                                        ]) ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
