@@ -4,78 +4,119 @@
 /** @var string $content */
 
 use app\assets\AppAsset;
-use app\widgets\Alert;
-use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
 AppAsset::register($this);
-
-$this->registerCsrfMetaTags();
-$this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
-$this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no']);
-$this->registerMetaTag(['name' => 'description', 'content' => $this->params['meta_description'] ?? '']);
-$this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
-$this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
+    <meta charset="<?= Yii::$app->charset ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <style>
+        body {
+            padding-top: 56px;
+        }
+        .sidebar {
+            position: fixed;
+            top: 56px;
+            bottom: 0;
+            left: 0;
+            width: 200px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .sidebar .nav {
+            flex-direction: column;
+        }
+        .sidebar .nav-item {
+            width: 100%;
+        }
+        .sidebar .nav-link {
+            color: #333;
+            padding: 10px 20px;
+            display: block;
+            border-radius: 0;
+        }
+        .sidebar .nav-link:hover {
+            background-color: #e9ecef;
+        }
+        .main-content {
+            margin-left: 200px;
+            padding: 20px;
+        }
+        .logout-button {
+            position: absolute;
+            bottom: 20px;
+            width: 160px;
+            left: 20px;
+        }
+    </style>
 </head>
 <body class="d-flex flex-column h-100">
 <?php $this->beginBody() ?>
 
-<header id="header">
+<div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => Yii::$app->name,
+        'brandLabel' => 'Construction Management System',
         'brandUrl' => Yii::$app->homeUrl,
-        'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
+        'options' => [
+            'class' => 'navbar navbar-expand-lg navbar-dark bg-dark fixed-top',
+        ],
     ]);
+    
     echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
+        'options' => ['class' => 'navbar-nav ms-auto'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest
-                ? ['label' => 'Login', 'url' => ['/site/login']]
-                : '<li class="nav-item">'
-                    . Html::beginForm(['/site/logout'])
-                    . Html::submitButton(
-                        'Logout (' . Yii::$app->user->identity->username . ')',
-                        ['class' => 'nav-link btn btn-link logout']
-                    )
-                    . Html::endForm()
-                    . '</li>'
-        ]
+            ['label' => 'User: ' . Yii::$app->user->identity->getFullName(), 'url' => '#', 'options' => ['class' => 'text-white']],
+        ],
     ]);
+    
     NavBar::end();
     ?>
-</header>
 
-<main id="main" class="flex-shrink-0" role="main">
-    <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
-            <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
-        <?= Alert::widget() ?>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <?php
+        echo Nav::widget([
+            'options' => ['class' => 'nav flex-column'],
+            'items' => [
+                [
+                    'label' => 'Worker Management',
+                    'url' => ['/worker-management/index'],
+                ],
+                [
+                    'label' => 'Construction Sites',
+                    'url' => ['/construction-site/index'],
+                ],
+                [
+                    'label' => 'Construction Tasks',
+                    'url' => ['/construction-site-task/index'],
+                ],
+            ],
+        ]);
+        ?>
+        
+        <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'logout-button']) ?>
+            <?= Html::submitButton('Logout', ['class' => 'btn btn-danger w-100']) ?>
+        <?= Html::endForm() ?>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
         <?= $content ?>
     </div>
-</main>
-
-<footer id="footer" class="mt-auto py-3 bg-light">
-    <div class="container">
-        <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; My Company <?= date('Y') ?></div>
-            <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
-        </div>
-    </div>
-</footer>
+</div>
 
 <?php $this->endBody() ?>
 </body>

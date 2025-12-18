@@ -7,18 +7,14 @@ use yii\base\Model;
 
 /**
  * LoginForm is the model behind the login form.
- *
- * @property-read User|null $user
- *
  */
 class LoginForm extends Model
 {
-    public $username;
+    public $login;
     public $password;
-    public $rememberMe = true;
+    public $rememberMe = false;
 
     private $_user = false;
-
 
     /**
      * @return array the validation rules.
@@ -26,11 +22,8 @@ class LoginForm extends Model
     public function rules()
     {
         return [
-            // username and password are both required
-            [['username', 'password'], 'required'],
-            // rememberMe must be a boolean value
+            [['login', 'password'], 'required'],
             ['rememberMe', 'boolean'],
-            // password is validated by validatePassword()
             ['password', 'validatePassword'],
         ];
     }
@@ -48,13 +41,13 @@ class LoginForm extends Model
             $user = $this->getUser();
 
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect username or password.');
+                $this->addError($attribute, 'Incorrect login or password.');
             }
         }
     }
 
     /**
-     * Logs in a user using the provided username and password.
+     * Logs in a user using the provided login and password.
      * @return bool whether the user is logged in successfully
      */
     public function login()
@@ -66,16 +59,28 @@ class LoginForm extends Model
     }
 
     /**
-     * Finds user by [[username]]
+     * Finds user by login
      *
      * @return User|null
      */
     public function getUser()
     {
         if ($this->_user === false) {
-            $this->_user = User::findByUsername($this->username);
+            $this->_user = User::findByLogin($this->login);
         }
 
         return $this->_user;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'login' => 'Login',
+            'password' => 'Password',
+            'rememberMe' => 'Remember Me',
+        ];
     }
 }
