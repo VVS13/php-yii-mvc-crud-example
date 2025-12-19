@@ -100,3 +100,22 @@ docker compose down -v
 docker compose up -d --build
 docker exec construction_php php yii migrate --interactive=0
 ```
+
+## Database Backup
+
+### Create DB backup file in container
+```bash
+cd php-yii-mvc-crud-example
+docker exec construction_mssql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Ku12x66W73=/" -C -Q "BACKUP DATABASE construction_db TO DISK = '/tmp/construction_db.bak' WITH FORMAT"
+```
+
+### Copy to project folder
+```bash
+docker cp construction_mssql:/tmp/construction_db.bak ./construction_db.bak
+```
+
+### Remove DB backup file from container
+```bash
+docker exec construction_mssql rm /tmp/construction_db.bak
+```
+
