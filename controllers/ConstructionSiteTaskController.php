@@ -143,7 +143,7 @@ public function actionIndex()
                 $messages = [
                     'worker_not_assigned' => 'Task created successfully. Warning: No worker assigned to this task.',
                     'worker_disabled' => 'Task created successfully. Warning: Assigned worker is disabled.',
-                    'worker_access_level_issue' => 'Task created successfully. Warning: Worker access level (' . $model->assignedWorker->access_level . ') is below site requirement (' . $model->constructionSite->access_level_needed . '). Physical access may be denied.',
+                    'worker_access_level_issue' => 'Task created successfully. Warning: Worker access level is below site requirement. Physical access may be denied.',
                 ];
                 Yii::$app->session->setFlash('warning', $messages[$warning]);
             } else {
@@ -188,7 +188,7 @@ public function actionIndex()
         $currentUser = Yii::$app->user->identity;
         $model = $this->findModel($id);
 
-        if (!$this->canEditTask($model)) {
+        if (!$this->canEditTask($model) && !$model->isPast()) {
             throw new NotFoundHttpException('You do not have permission to edit this task.');
         }
 
@@ -199,7 +199,7 @@ public function actionIndex()
                 $messages = [
                     'worker_not_assigned' => 'Task updated successfully. Warning: No worker assigned to this task.',
                     'worker_disabled' => 'Task updated successfully. Warning: Assigned worker is disabled.',
-                    'worker_access_level_issue' => 'Task updated successfully. Warning: Worker access level (' . $model->assignedWorker->access_level . ') is below site requirement (' . $model->constructionSite->access_level_needed . '). Physical access may be denied.',
+                    'worker_access_level_issue' => 'Task updated successfully. Warning: Worker access level is below site requirement. Physical access may be denied.',
                 ];
                 Yii::$app->session->setFlash('warning', $messages[$warning]);
             } else {
@@ -310,7 +310,7 @@ public function actionIndex()
             return true;
         }
 
-        // Managers can edit tasks only on Ftheir assigned sites
+        // Managers can edit tasks only on their assigned sites
         if ($currentUser->isManager()) {
             return $task->constructionSite && 
                    $task->constructionSite->manager_id === $currentUser->id;

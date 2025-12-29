@@ -6,10 +6,12 @@ use yii\helpers\Html;
 /** @var app\models\ConstructionSiteTask $model */
 /** @var app\models\User $currentUser */
 
-$canEdit = !$currentUser->isWorker() && 
+$canDelete = !$currentUser->isWorker() && 
            $model->company_id === $currentUser->company_id &&
            ($currentUser->isAdmin() || 
             ($currentUser->isManager() && $model->constructionSite && $model->constructionSite->manager_id === $currentUser->id));
+
+$canEdit = !$model->isPast() && $canDelete;
 ?>
 
 <div class="modal-header">
@@ -21,12 +23,14 @@ $canEdit = !$currentUser->isWorker() &&
         <div class="alert alert-warning">
             <i class="bi bi-exclamation-triangle"></i>
             <?php
-            $warnings = [
-                'worker_not_assigned' => 'No worker assigned to this task.',
-                'worker_disabled' => 'Assigned worker is currently disabled in the system.',
-                'worker_access_level_issue' => 'Worker access level (' . $model->assignedWorker->access_level . ') is below site requirement (' . $model->constructionSite->access_level_needed . '). Physical access may be denied.',
-            ];
-            echo $warnings[$model->getWarningStatus()];
+            $warningStatus = $model->getWarningStatus();
+            if ($warningStatus === 'worker_not_assigned') {
+                echo 'No worker assigned to this task.';
+            } elseif ($warningStatus === 'worker_disabled') {
+                echo 'Assigned worker is currently disabled in the system.';
+            } elseif ($warningStatus === 'worker_access_level_issue' && $model->assignedWorker) {
+                echo 'Worker access level (' . $model->assignedWorker->access_level . ') is below site requirement (' . $model->constructionSite->access_level_needed . '). Physical access may be denied.';
+            }
             ?>
         </div>
     <?php endif; ?>
@@ -64,13 +68,17 @@ $canEdit = !$currentUser->isWorker() &&
         </div>
     <?php endif; ?>
 </div>
-<?php if ($canEdit): ?>
+<?php if ($canDelete || $canEdit): ?>
 <div class="modal-footer">
-    <?= Html::a('Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-    <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-        'class' => 'btn btn-danger',
-        'data-method' => 'post',
-        'data-confirm' => 'Are you sure you want to delete this task?',
-    ]) ?>
+    <?php if ($canEdit): ?>
+        <?= Html::a('Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+    <?php endif; ?>
+    <?php if ($canDelete): ?>
+        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+            'class' => 'btn btn-danger',
+            'data-method' => 'post',
+            'data-confirm' => 'Are you sure you want to delete this task?',
+        ]) ?>
+    <?php endif; ?>
 </div>
 <?php endif; ?>

@@ -59,18 +59,6 @@ $this->title = 'Construction Sites';
                                                 title="View">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <?php if ($currentUser->isAdmin()): ?>
-                                            <?= Html::a('<i class="bi bi-pencil"></i>', ['update', 'id' => $site->id], [
-                                                'class' => 'btn btn-sm btn-warning',
-                                                'title' => 'Edit',
-                                            ]) ?>
-                                            <?= Html::a('<i class="bi bi-trash"></i>', ['delete', 'id' => $site->id], [
-                                                'class' => 'btn btn-sm btn-danger',
-                                                'title' => 'Delete',
-                                                'data-method' => 'post',
-                                                'data-confirm' => 'Are you sure you want to delete this site? All tasks will be deleted as well.',
-                                            ]) ?>
-                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

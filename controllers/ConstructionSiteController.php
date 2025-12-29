@@ -45,7 +45,7 @@ class ConstructionSiteController extends Controller
         /** @var app\models\User $currentUser */
         $currentUser = Yii::$app->user->identity;
         
-        $query = ConstructionSite::find()->where(['company_id' => $currentUser->company_id]);
+        $query = ConstructionSite::find()->where(['construction_sites.company_id' => $currentUser->company_id]);
         
         if ($currentUser->isManager()) {
             // Managers see only sites assigned to them
