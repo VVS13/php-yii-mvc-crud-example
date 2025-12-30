@@ -6,13 +6,13 @@ use Yii;
 use app\models\User;
 use app\models\ConstructionSite;
 use app\models\ConstructionSiteTask;
-use yii\web\Controller;
+use yii\rest\Controller;
 use yii\filters\VerbFilter;
 use yii\web\Response;
 
 /**
  * Info for testing:
- * POST http://localhost:8080/access/check
+ * POST http://localhost:8080/index.php?r=access/check
  * Body (x-www-form-urlencoded):
  * user_id: 1
  * company_id: 1
@@ -25,8 +25,6 @@ use yii\web\Response;
 
 class AccessController extends Controller
 {
-    public $enableCsrfValidation = false;
-
     public function behaviors()
     {
         return [
